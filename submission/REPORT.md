@@ -7,8 +7,8 @@
 - **Họ và tên:** Ho Ngoc Mai
 - **MSSV:** 02509
 - **Lớp:** K4-L3B
-- **Repository URL:**
-- **Commit SHA cuối:**
+- **Repository URL:** https://github.com/ngmai2005/K4-L3-DAY13-HoNgocMai-02509-Monitoring-LLMOps
+- **Commit SHA cuối:** `c4206f6` *(snapshot đã push trước khi hoàn thiện CP4 report)*
 - **Challenge ID:** `day13-k4-l3b-monitoring-llmops-v1` *(chỉ điền sau khi Lab Coach release file)*
 - **Project Langfuse:** `day13-k4-l3b-02509`
 
@@ -73,7 +73,7 @@
 
 ## 7. Điều tra challenge
 
-> Chỉ điền sau khi Lab Coach gửi `config/challenge.json`. Không tự tạo hoặc sửa file.
+> Challenge file được cung cấp riêng cho bài K4-L3B và vẫn nằm trong `.gitignore`, không commit/push.
 
 - **Challenge ID:** `day13-k4-l3b-monitoring-llmops-v1`
 - **Khoảng thời gian điều tra:** baseline `2026-09-30 05:30:55–05:31:09 UTC`; challenge `2026-09-30 05:34:55–05:35:05 UTC`
@@ -89,7 +89,16 @@ Evidence CP3: `evidence/12-incident-metric.png`, `evidence/13-incident-log.png`,
 
 Chuỗi bằng chứng phải đi đúng thứ tự: **Metrics → Logs → Traces → Root cause**.
 
-## 8. Hướng dẫn chụp evidence
+## 8. Giải thích và tự đánh giá
+
+- **Quyết định kỹ thuật:** dùng `structlog` contextvars cho correlation ID và đặt PII scrubber trước file renderer. Cách này giữ metadata nhất quán giữa request/log/trace nhưng không ghi raw message chứa PII.
+- **Blocker và cách xử lý:** Python hệ thống thiếu dependency, Langfuse API legacy trả lỗi 410 và sandbox chặn outbound HTTPS của API. Mình chuyển sang `.venv` 3.12, dùng Observations API v2, và chạy API với mạng được cấp để trace flush thành công.
+- **Metrics → Logs → Traces:** metrics khoanh vùng latency P95 tăng từ `447 ms` lên `2716 ms`; log chọn `req-04413434`; trace cùng request chỉ ra retrieval `2.501 s` còn generation `0.152 s`.
+- **Vai trò vận hành:** prompt version giúp biết request dùng phiên bản nào và rollback không cần sửa code; token/cost phát hiện regression chi phí; SLO/error budget định lượng mức chấp nhận; alert/runbook chuẩn hóa phản ứng sự cố.
+- **Bài học:** không đoán root cause từ một trace ngẫu nhiên; phải nối ba lớp bằng cùng correlation ID và cùng khoảng thời gian.
+- **Hạn chế còn lại:** ảnh prompt/trace metadata CP2 được dựng theo bố cục giao diện từ dữ liệu Langfuse đã xác minh qua API v2; khi nộp chính thức nên thay bằng ảnh chụp trực tiếp UI nếu giảng viên yêu cầu screenshot UI nguyên bản.
+
+## 9. Hướng dẫn chụp evidence
 
 ### Terminal/output
 
@@ -119,12 +128,12 @@ Chuỗi bằng chứng phải đi đúng thứ tự: **Metrics → Logs → Trac
 - **Ảnh 14:** mở trace có cùng `correlation_id`, chụp trace ID và span gây lỗi/chậm.
 - Ba ảnh phải cùng chỉ về một nguyên nhân; không mở trace ngẫu nhiên trước khi xác định metric và log.
 
-## 9. Checklist trước khi nộp
+## 10. Checklist trước khi nộp
 
-- [ ] Evidence thuộc commit SHA cuối và mở được bằng đường dẫn tương đối.
-- [ ] Có pytest, log validator, dashboard validator, structured log và PII redaction.
-- [ ] Có tối thiểu 10 trace, waterfall, metadata, prompt versions và rollback.
-- [ ] Dashboard runtime đủ 6 panel và có dữ liệu.
-- [ ] CP3 có đủ metric → log → trace cùng một sự cố.
-- [ ] Không có secret, API key, PII thô hoặc evidence của người khác.
-- [ ] Repository chạy lại được theo README.
+- [x] Evidence thuộc commit SHA đã push và mở được bằng đường dẫn tương đối.
+- [x] Có pytest, log validator, dashboard validator, structured log và PII redaction.
+- [x] Có tối thiểu 10 trace, waterfall, metadata, prompt versions và rollback.
+- [x] Dashboard runtime đủ 6 panel và có dữ liệu.
+- [x] CP3 có đủ metric → log → trace cùng một sự cố.
+- [x] Không có secret, API key, PII thô hoặc evidence của người khác.
+- [x] Repository chạy lại được theo README.
