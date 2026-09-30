@@ -1,0 +1,2 @@
+Command: .\.venv\Scripts\python.exe -m pytest -q
+Result: 25 passed, 2 warnings in 1.92s

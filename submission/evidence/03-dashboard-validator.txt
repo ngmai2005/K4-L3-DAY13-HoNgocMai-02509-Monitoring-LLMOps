@@ -1,0 +1,2 @@
+Command: .\.venv\Scripts\python.exe scripts/validate_dashboard.py
+Result: HOP LE: 6/6 panel co trong dashboard contract.
